@@ -1,7 +1,9 @@
-# QB3 - DePIN pour la logistique du dernier kilomètre
+<!-- markdownlint-disable MD033 MD041 -->
+<p align="center">
+  <img src="./logo.png" alt="QB3 Logo" width="200"/>
+</p>
 
-**Date de début** : 24 mars 2025
-**Date limite** : 6 avril 2025
+# QB3 - DePIN pour la logistique du dernier kilomètre
 
 ## 🚀 Pitch
 
