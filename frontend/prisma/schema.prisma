@@ -12,3 +12,15 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model StorageLocation {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  address           String
+  city              String
+  postalCode        String
+  floor             String?
+  additionalDetails String?
+  locationHash      String   @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
