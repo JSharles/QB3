@@ -2,6 +2,8 @@
 pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./QB3Token.sol";
 
 /// @title StorageRegistry - Manage storage registration
 /// @notice Handle storage registration based on capicity, availability and location
@@ -12,6 +14,16 @@ contract StorageRegistry is Ownable {
     error InvalidCapacity();
     error NotSpaceOwner();
     error InvalidTimeRange();
+    error InsufficientBalance();
+    error InsufficientVolume();
+
+    IERC20 public qb3Token;
+
+    /**
+     * @notice In the context of the POC these values are fixed, but should be dynamic in the future
+     */
+    uint256 public rewardPerUnit = 2 * 10**18;
+    uint256 public reservationCost = 5 * 10**18;
 
     /**
      * @notice Availability window for a storage space.
@@ -29,6 +41,7 @@ contract StorageRegistry is Ownable {
     struct StorageSpace {
         address owner;
         uint256 capacity;
+        uint256 usedVolume;
         Availability availability;
         bytes32 locationHash;
         bool isActive;
@@ -43,6 +56,11 @@ contract StorageRegistry is Ownable {
      * @notice Mapping from spaceId to StorageSpace details.
      */
     mapping(uint256 => StorageSpace) public spaces;
+
+     /**
+     * @notice Mapping from zone to total available volume.
+     */
+    mapping(bytes32 => uint256) public zoneAvailableVolume;
 
     /**
      * @notice Emitted when a new storage space is successfully registered.
@@ -87,7 +105,9 @@ contract StorageRegistry is Ownable {
      * @notice Sets the contract deployer as the initial owner.
      * @dev This can be replaced by a DAO or multi-sig in the future.
      */
-    constructor() Ownable(msg.sender) {}
+    constructor(address _qb3Token) Ownable(msg.sender) {
+        qb3Token = IERC20(_qb3Token);
+    }
 
     /**
      * @notice Registers a new storage space with capacity, availability, and location hash.
@@ -116,11 +136,14 @@ contract StorageRegistry is Ownable {
         spaces[spaceId] = StorageSpace({
             owner: msg.sender,
             capacity: capacity,
+            usedVolume: 0,
             availability: Availability(true, startTime, endTime),
             locationHash: locationHash,
             isActive: true
         });
 
+        uint256 reward = capacity * rewardPerUnit;
+        QB3Token(address(qb3Token)).mint(msg.sender, reward);
         emit SpaceRegistered(spaceId, msg.sender);
     }
 
@@ -183,6 +206,6 @@ contract StorageRegistry is Ownable {
     require(!spaces[spaceId].isActive, "Already active");
     spaces[spaceId].isActive = true;
     emit SpaceReactivated(spaceId, block.timestamp);
-}
+    }
 
 }

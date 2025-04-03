@@ -5,6 +5,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 
 import { APP_DESCRIPTION, APP_NAME, SERVER_URL } from "@/lib/constants";
 import { Providers } from "./providers";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,18 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative min-h-screen`}
       >
         <Providers>{children}</Providers>
+        <Toaster
+          position="bottom-center"
+          theme="dark"
+          richColors
+          toastOptions={{
+            style: {
+              background: "#1a1a1a",
+              border: "1px solid #333",
+              color: "#fff",
+            },
+          }}
+        />
       </body>
     </html>
   );
