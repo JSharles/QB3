@@ -14,6 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { keccak256, stringToBytes } from "viem";
+import { useAccount, useWriteContract } from "wagmi";
+import { toast } from "sonner";
+import { useEffect } from "react";
+import { SPACE_REGISTRY_ABI, SPACE_REGISTRY_ADDRESS } from "@/lib/constants";
+import { registerConfidentialData } from "@/lib/actions/space-location.actions";
 
 const storageLocationSchema = z.object({
   address: z.string().nonempty({ message: "Address is required" }),
@@ -42,6 +48,7 @@ const storageLocationSchema = z.object({
   volume: z.coerce.number().min(1, { message: "Minimum volume is 1 m³" }),
   availabilityStart: z.string().nonempty("Start time required"),
   availabilityEnd: z.string().nonempty("End time required"),
+  userWallet: z.string().nonempty("Please connect your wallet"),
 });
 
 type StorageLocationFormData = z.infer<typeof storageLocationSchema>;
@@ -56,17 +63,90 @@ const textareaStyle =
   "w-full h-24 border-0 border-b border-white/30 bg-transparent text-white placeholder:text-white/60 text-base rounded-none focus:outline-none focus:ring-1 focus:ring-white/30 focus:border-white/50 transition";
 
 const HostApplicationForm = () => {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<StorageLocationFormData>({
-    resolver: zodResolver(storageLocationSchema),
-  });
+  const { register, handleSubmit, setValue, formState } =
+    useForm<StorageLocationFormData>({
+      resolver: zodResolver(storageLocationSchema),
+    });
 
-  const onSubmit = (data: StorageLocationFormData) => {
-    console.log("Submitted data:", data);
+  const { address: userWallet } = useAccount();
+
+  useEffect(() => {
+    if (userWallet) {
+      setValue("userWallet", userWallet);
+    }
+  }, [userWallet, setValue]);
+
+  const { writeContractAsync } = useWriteContract();
+
+  const onSubmit = async (data: StorageLocationFormData) => {
+    try {
+      const {
+        address,
+        floor,
+        postalCode,
+        city,
+        additionalDetails,
+        availabilityStart,
+        availabilityEnd,
+        volume,
+        userWallet,
+      } = data;
+
+      const zoneHash = keccak256(stringToBytes(city.trim().toLowerCase()));
+
+      const fullLocation = `${address.trim()}, ${floor ?? ""}, ${
+        additionalDetails ?? ""
+      }`.trim();
+      const locationHash = keccak256(stringToBytes(fullLocation.toLowerCase()));
+
+      const now = new Date();
+      const [startHour, startMin] = availabilityStart.split(":").map(Number);
+      const [endHour, endMin] = availabilityEnd.split(":").map(Number);
+
+      const startTime =
+        new Date(now.setHours(startHour, startMin, 0, 0)).getTime() / 1000;
+      const endTime =
+        new Date(now.setHours(endHour, endMin, 0, 0)).getTime() / 1000;
+
+      console.log({
+        zoneHash,
+        locationHash,
+        startTime,
+        endTime,
+        capacity: volume,
+      });
+
+      const res = await registerConfidentialData({
+        address,
+        city,
+        postalCode,
+        floor,
+        additionalDetails,
+        locationHash,
+        zoneHash,
+        userWallet,
+      });
+
+      if (res.status !== "ok") {
+        toast.error("❌ Échec d’enregistrement côté serveur");
+        return;
+      }
+
+      await writeContractAsync({
+        abi: SPACE_REGISTRY_ABI,
+        address: SPACE_REGISTRY_ADDRESS,
+        functionName: "registerSpace",
+        args: [
+          BigInt(volume),
+          zoneHash,
+          locationHash,
+          BigInt(startTime),
+          BigInt(endTime),
+        ],
+      });
+    } catch (err) {
+      console.error("Submission error:", err);
+    }
   };
 
   return (
@@ -86,6 +166,7 @@ const HostApplicationForm = () => {
           onSubmit={handleSubmit(onSubmit)}
           className="w-full bg-white/5 backdrop-blur-md rounded-2xl p-10 shadow-2xl border border-white/10 grid grid-cols-1 md:grid-cols-2 gap-8"
         >
+          <input type="hidden" {...register("userWallet")} />
           {[
             {
               id: "address",
@@ -106,22 +187,23 @@ const HostApplicationForm = () => {
                 placeholder={placeholder}
                 className={inputStyle}
               />
-              {errors?.[id as keyof StorageLocationFormData] && (
+              {formState.errors?.[id as keyof StorageLocationFormData] && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors[
+                  {formState.errors[
                     id as keyof StorageLocationFormData
                   ]?.message?.toString()}
                 </p>
               )}
             </div>
           ))}
-          {/* Owner type */}
           <div>
             <Label htmlFor="ownerType" className={labelStyle}>
               Owner Type
             </Label>
             <Select
-              onValueChange={(value) => setValue("ownerType", value)}
+              onValueChange={(value: "individual" | "company") =>
+                setValue("ownerType", value)
+              }
               defaultValue=""
             >
               <SelectTrigger
@@ -134,9 +216,9 @@ const HostApplicationForm = () => {
                 <SelectItem value="company">Company</SelectItem>
               </SelectContent>
             </Select>
-            {errors.ownerType && (
+            {formState.errors.ownerType && (
               <p className="text-red-500 text-sm mt-1">
-                {errors.ownerType.message}
+                {formState.errors.ownerType.message}
               </p>
             )}
           </div>
@@ -164,14 +246,13 @@ const HostApplicationForm = () => {
                 <SelectItem value="storage_unit">Storage Unit</SelectItem>
               </SelectContent>
             </Select>
-            {errors.roomType && (
+            {formState.errors.roomType && (
               <p className="text-red-500 text-sm mt-1">
-                {errors.roomType.message}
+                {formState.errors.roomType.message}
               </p>
             )}
           </div>
           {/* Volume */}
-
           <div>
             <Label htmlFor="availabilityStart" className={labelStyle}>
               Availability Start
@@ -182,9 +263,9 @@ const HostApplicationForm = () => {
               {...register("availabilityStart")}
               className={smallInputStyle}
             />
-            {errors.availabilityStart && (
+            {formState.errors.availabilityStart && (
               <p className="text-red-500 text-sm mt-1">
-                {errors.availabilityStart.message}
+                {formState.errors.availabilityStart.message}
               </p>
             )}
           </div>
@@ -198,13 +279,12 @@ const HostApplicationForm = () => {
               {...register("availabilityEnd")}
               className={smallInputStyle}
             />
-            {errors.availabilityEnd && (
+            {formState.errors.availabilityEnd && (
               <p className="text-red-500 text-sm mt-1">
-                {errors.availabilityEnd.message}
+                {formState.errors.availabilityEnd.message}
               </p>
             )}
           </div>
-
           <div>
             <Label htmlFor="volume" className={labelStyle}>
               Volume (m³)
@@ -218,13 +298,12 @@ const HostApplicationForm = () => {
               placeholder="e.g. 12.5"
               className={smallInputStyle}
             />
-            {errors.volume && (
+            {formState.errors.volume && (
               <p className="text-red-500 text-sm mt-1">
-                {errors.volume.message}
+                {formState.errors.volume.message}
               </p>
             )}
           </div>
-
           <div className="md:col-span-2">
             <Label htmlFor="additionalDetails" className={labelStyle}>
               Additional Details
@@ -235,15 +314,16 @@ const HostApplicationForm = () => {
               placeholder="Optional info (access code, parking, etc.)"
               className={textareaStyle}
             />
-            {errors.additionalDetails && (
+            {formState.errors.additionalDetails && (
               <p className="text-red-500 text-sm mt-1">
-                {errors.additionalDetails.message}
+                {formState.errors.additionalDetails.message}
               </p>
             )}
           </div>
           <div className="md:col-span-2">
             <Button
               type="submit"
+              disabled={!formState.isValid || !userWallet}
               className="w-full bg-white/10 hover:bg-white/20 text-white text-lg font-semibold py-6 transition-colors duration-200 border border-white/30"
             >
               Connect space to the network
