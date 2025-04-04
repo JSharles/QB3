@@ -1,8 +1,8 @@
 "use client";
 
-import { useAccount, useDisconnect, useBalance } from "wagmi";
+import { useAccount, useDisconnect, useBalance, useChainId } from "wagmi";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Ajoutez useEffect
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import {
   DropdownMenu,
@@ -12,14 +12,14 @@ import {
 } from "../ui/dropdown-menu";
 import { QB3_TOKEN_ADDRESS } from "@/lib/constants";
 import { formatUnits } from "viem";
+import { sepolia } from "wagmi/chains"; // Or import selectedChain from your config
 
 const CustomConnectButton = () => {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, isConnecting } = useAccount(); // Ajoutez isConnecting
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
-
-  const { data: balance } = useBalance({ address, unit: "ether" });
-
+  const chainId = useChainId();
+  const { data: balance } = useBalance({ address });
   const { data: qb3Balance } = useBalance({
     address,
     token: `0x${QB3_TOKEN_ADDRESS}`,
@@ -27,6 +27,17 @@ const CustomConnectButton = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const selectedChain = sepolia; // Replace with imported selectedChain if needed
+  console.log(
+    "isConnected:",
+    isConnected,
+    "isConnecting:",
+    isConnecting,
+    "Address:",
+    address
+  );
+  console.log("Active Chain ID:", chainId);
 
   const copyToClipboard = () => {
     if (address) {
@@ -41,10 +52,20 @@ const CustomConnectButton = () => {
 
   const ethBalanceFormatted = balance
     ? formatUnits(balance.value, balance.decimals)
-    : "Chargement...";
+    : "Loading...";
   const qb3BalanceFormatted = qb3Balance
     ? formatUnits(qb3Balance.value, qb3Balance.decimals)
     : "";
+
+  // Log pour vérifier les changements d'état
+  useEffect(() => {
+    console.log(
+      "Connection state changed - isConnected:",
+      isConnected,
+      "Address:",
+      address
+    );
+  }, [isConnected, address]);
 
   if (!isConnected) {
     return (
@@ -59,43 +80,50 @@ const CustomConnectButton = () => {
   }
 
   return (
-    <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button className={baseButtonClasses}>
-          {address?.slice(0, 6)}...{address?.slice(-4)}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="bg-black/20 backdrop-blur-md border border-white/10 rounded-md p-2 w-64"
-      >
-        <div className="text-white text-sm px-3 py-2 flex justify-between items-center">
-          <span className="truncate">{address}</span>
-          <button onClick={copyToClipboard} className="text-white text-xs">
-            {copied ? "Copied!" : "Copy"}
-          </button>
-        </div>
-        <div className="border-t border-gray-700 my-2" />
-        <div className="text-white text-sm px-3 py-2">
-          ETH: {ethBalanceFormatted} {balance?.symbol}
-        </div>
-        {qb3Balance && (
-          <div className="text-white text-sm px-3 py-2">
-            QB3: {qb3BalanceFormatted} {qb3Balance.symbol}
-          </div>
-        )}
-        <div className="border-t border-gray-700 my-2" />
-        <DropdownMenuItem
-          onClick={() => {
-            disconnect();
-            setIsMenuOpen(false);
-          }}
-          className="cursor-pointer !text-red-500 hover:!text-red-800 hover:bg-transparent focus:bg-transparent"
+    <div className="flex flex-col items-center gap-2">
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button className={baseButtonClasses}>
+            {address?.slice(0, 6)}...{address?.slice(-4)}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          className="bg-black/20 backdrop-blur-md border border-white/10 rounded-md p-2 w-64"
         >
-          Log Out
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <div className="text-white text-sm px-3 py-2 flex justify-between items-center">
+            <span className="truncate">{address}</span>
+            <button onClick={copyToClipboard} className="text-white text-xs">
+              {copied ? "Copied!" : "Copy"}
+            </button>
+          </div>
+          <div className="border-t border-gray-700 my-2" />
+          <div className="text-white text-sm px-3 py-2">
+            ETH: {ethBalanceFormatted} {balance?.symbol}
+          </div>
+          {qb3Balance && (
+            <div className="text-white text-sm px-3 py-2">
+              QB3: {qb3BalanceFormatted} {qb3Balance.symbol}
+            </div>
+          )}
+          <div className="border-t border-gray-700 my-2" />
+          <DropdownMenuItem
+            onClick={() => {
+              disconnect();
+              setIsMenuOpen(false);
+            }}
+            className="cursor-pointer !text-red-500 hover:!text-red-800 hover:bg-transparent focus:bg-transparent"
+          >
+            Disconnect
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {chainId !== selectedChain.id && (
+        <div className="text-red-500 text-xs text-center">
+          Please switch to the {selectedChain.name} network
+        </div>
+      )}
+    </div>
   );
 };
 
