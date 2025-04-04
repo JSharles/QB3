@@ -17,4 +17,5 @@ const adapter = new PrismaNeon(pool);
 export const prisma = new PrismaClient({
   adapter,
   // log: ["query"],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any);

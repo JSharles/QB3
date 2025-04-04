@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Header from "@/components/header/header";
 import HeaderLanding from "@/components/header-landing/header-landing";
 
 export default function LandingLayout({

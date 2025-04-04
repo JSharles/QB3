@@ -136,7 +136,7 @@ const HostApplicationForm = () => {
 
       const hash = await writeContractAsync({
         abi: SPACE_REGISTRY_ABI,
-        address: SPACE_REGISTRY_ADDRESS,
+        address: `0x${SPACE_REGISTRY_ADDRESS}`,
         functionName: "registerSpace",
         args: [
           BigInt(volume),
@@ -152,6 +152,8 @@ const HostApplicationForm = () => {
       await waitForTransactionReceipt(publicClient, { hash });
 
       toast.success("Space is connected to the network");
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       const message = err?.shortMessage || "On-chain registration failed";
       toast.error(message);
@@ -237,7 +239,8 @@ const HostApplicationForm = () => {
               Room Type
             </Label>
             <Select
-              onValueChange={(value) => setValue("roomType", value)}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              onValueChange={(value: any) => setValue("roomType", value)}
               defaultValue=""
             >
               <SelectTrigger

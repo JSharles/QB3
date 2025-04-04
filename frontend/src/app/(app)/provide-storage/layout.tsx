@@ -1,6 +1,4 @@
 import Image from "next/image";
-
-import HeaderLanding from "@/components/header-landing/header-landing";
 import Header from "@/components/header/header";
 
 export default function ProvideStorageLayout({

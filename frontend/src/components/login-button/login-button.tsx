@@ -21,7 +21,7 @@ const CustomConnectButton = () => {
 
   const { data: qb3Balance } = useBalance({
     address,
-    token: QB3_TOKEN_ADDRESS,
+    token: `0x${QB3_TOKEN_ADDRESS}`,
   });
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
