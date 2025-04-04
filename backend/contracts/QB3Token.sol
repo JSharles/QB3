@@ -9,7 +9,7 @@ contract QB3Token is ERC20, Ownable {
     mapping(address => bool) public isMinter;
 
     constructor() ERC20("QB3 Token", "QB3") Ownable(msg.sender) {
-        // Mint initial (trésorerie DAO, tests, etc.)
+
         _mint(msg.sender, 1_000 * 10 ** 18);
     }
 
