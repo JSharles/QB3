@@ -6,7 +6,7 @@ const HeaderLanding = () => {
   return (
     <header className="flex items-center justify-between px-8 text-sm text-primary-foreground">
       <div>
-        <Image src="/images/logo.png" alt="QB3 Logo" width={180} height={180} />
+        <Image src="/images/logo.png" alt="QB3 Logo" width={150} height={150} />
       </div>
       <nav className="space-x-8 [&>a]:text-lg [&>a]:text-primary-foreground/60 [&>a]:hover:text-primary-foreground">
         <Link href="/dispatch" legacyBehavior>

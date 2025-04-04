@@ -62,7 +62,7 @@ const smallInputStyle = `${inputStyle} w-32`;
 
 const labelStyle = "text-white text-base font-medium tracking-tight mb-1 block";
 const textareaStyle =
-  "w-full h-24 border-0 border-b border-white/30 bg-transparent text-white placeholder:text-white/60 text-base rounded-none focus:outline-none focus:ring-1 focus:ring-white/30 focus:border-white/50 transition";
+  "w-full h-16 border-0 border-b border-white/30 bg-transparent text-white placeholder:text-white/60 text-base rounded-none focus:outline-none focus:ring-1 focus:ring-white/30 focus:border-white/50 transition";
 
 const HostApplicationForm = () => {
   const { register, handleSubmit, setValue, formState } =
@@ -130,7 +130,7 @@ const HostApplicationForm = () => {
       });
 
       if (res.status !== "ok") {
-        toast.error("Off-chain regsitration failed");
+        toast.error("Off-chain registration failed");
         return;
       }
 
@@ -152,8 +152,6 @@ const HostApplicationForm = () => {
       await waitForTransactionReceipt(publicClient, { hash });
 
       toast.success("Space is connected to the network");
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       const message = err?.shortMessage || "On-chain registration failed";
       toast.error(message);
@@ -162,7 +160,7 @@ const HostApplicationForm = () => {
   };
 
   return (
-    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
+    <section className="relative py-12 w-full flex items-center justify-center overflow-hidden bg-black">
       <Image
         src="/images/host.webp"
         alt="Background"
@@ -176,7 +174,7 @@ const HostApplicationForm = () => {
       <div className="relative z-10 w-full max-w-4xl px-4">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-full bg-white/5 backdrop-blur-md rounded-2xl p-10 shadow-2xl border border-white/10 grid grid-cols-1 md:grid-cols-2 gap-8"
+          className="w-full bg-white/5 backdrop-blur-md rounded-2xl p-6 shadow-2xl border border-white/10 grid grid-cols-1 md:grid-cols-2 gap-8"
         >
           <input type="hidden" {...register("userWallet")} />
           {[
@@ -264,7 +262,6 @@ const HostApplicationForm = () => {
               </p>
             )}
           </div>
-          {/* Volume */}
           <div>
             <Label htmlFor="availabilityStart" className={labelStyle}>
               Availability Start
@@ -336,7 +333,7 @@ const HostApplicationForm = () => {
             <Button
               type="submit"
               disabled={!formState.isValid || !userWallet}
-              className="w-full bg-white/10 hover:bg-white/20 text-white text-lg font-semibold py-6 transition-colors duration-200 border border-white/30"
+              className="w-full bg-white/10 hover:bg-white/20 text-white text-lg font-semibold py-3 transition-colors duration-200 border border-white/30"
             >
               Connect space to the network
             </Button>

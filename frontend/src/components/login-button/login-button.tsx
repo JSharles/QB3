@@ -10,12 +10,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { QB3_TOKEN_ADDRESS } from "@/lib/constants";
+import { formatUnits } from "viem";
 
 const CustomConnectButton = () => {
   const { address, isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
   const { data: balance } = useBalance({ address });
+
+  const { data: qb3Balance } = useBalance({
+    address,
+    token: QB3_TOKEN_ADDRESS,
+  });
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -30,6 +37,13 @@ const CustomConnectButton = () => {
 
   const baseButtonClasses =
     "px-6 py-3 border border-white text-white rounded-md bg-transparent transition-all duration-300 hover:bg-white hover:text-black";
+
+  const ethBalanceFormatted = balance
+    ? formatUnits(balance.value, balance.decimals)
+    : "Chargement...";
+  const qb3BalanceFormatted = qb3Balance
+    ? formatUnits(qb3Balance.value, qb3Balance.decimals)
+    : "";
 
   if (!isConnected) {
     return (
@@ -52,7 +66,7 @@ const CustomConnectButton = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="bg-[#67a5fc]] border border-white rounded-md p-2 w-64"
+        className="bg-black/20 backdrop-blur-md border border-white/10 rounded-md p-2 w-64"
       >
         <div className="text-white text-sm px-3 py-2 flex justify-between items-center">
           <span className="truncate">{address}</span>
@@ -61,13 +75,15 @@ const CustomConnectButton = () => {
           </button>
         </div>
         <div className="border-t border-gray-700 my-2" />
-
         <div className="text-white text-sm px-3 py-2">
-          Solde:{" "}
-          {balance ? `${balance.formatted} ${balance.symbol}` : "Chargement..."}
+          ETH: {ethBalanceFormatted} {balance?.symbol}
         </div>
+        {qb3Balance && (
+          <div className="text-white text-sm px-3 py-2">
+            QB3: {qb3BalanceFormatted} {qb3Balance.symbol}
+          </div>
+        )}
         <div className="border-t border-gray-700 my-2" />
-
         <DropdownMenuItem
           onClick={() => {
             disconnect();
@@ -75,7 +91,7 @@ const CustomConnectButton = () => {
           }}
           className="cursor-pointer !text-red-500 hover:!text-red-800 hover:bg-transparent focus:bg-transparent"
         >
-          Déconnexion
+          Log Out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
