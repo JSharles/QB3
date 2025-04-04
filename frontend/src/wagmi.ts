@@ -14,7 +14,7 @@ export const config = getDefaultConfig({
       process.env.NEXT_PUBLIC_RPC_URL || "https://rpc.sepolia.org"
     ),
   },
-  ssr: true,
+  ssr: false,
 });
 
 export const publicClient = createPublicClient({
