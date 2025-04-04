@@ -20,6 +20,8 @@ import { toast } from "sonner";
 import { useEffect } from "react";
 import { SPACE_REGISTRY_ABI, SPACE_REGISTRY_ADDRESS } from "@/lib/constants";
 import { registerConfidentialData } from "@/lib/actions/space-location.actions";
+import { waitForTransactionReceipt } from "viem/actions";
+import { publicClient } from "@/wagmi";
 
 const storageLocationSchema = z.object({
   address: z.string().nonempty({ message: "Address is required" }),
@@ -128,11 +130,11 @@ const HostApplicationForm = () => {
       });
 
       if (res.status !== "ok") {
-        toast.error("❌ Échec d’enregistrement côté serveur");
+        toast.error("Off-chain regsitration failed");
         return;
       }
 
-      await writeContractAsync({
+      const hash = await writeContractAsync({
         abi: SPACE_REGISTRY_ABI,
         address: SPACE_REGISTRY_ADDRESS,
         functionName: "registerSpace",
@@ -144,8 +146,18 @@ const HostApplicationForm = () => {
           BigInt(endTime),
         ],
       });
-    } catch (err) {
-      console.error("Submission error:", err);
+
+      toast.info("⏳ Transaction sent...");
+
+      await waitForTransactionReceipt(publicClient, { hash });
+
+      toast.success("Space is connected to the network");
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      const message = err?.shortMessage || "On-chain registration failed";
+      toast.error(message);
+      console.error("TX error:", err);
     }
   };
 
