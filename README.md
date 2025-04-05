@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD033 MD041 -->
 <p align="center">
-  <img src="./frontend/public/images/logo.png.png" alt="QB3 Logo" width="200"/>
+  <img src="./frontend/public/images/logo.png" alt="QB3 Logo" width="200"/>
 </p>
 
 # QB3 - DePIN pour la logistique du dernier kilomètre
