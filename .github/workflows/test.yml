@@ -19,13 +19,13 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
         working-directory: backend
 
       - name: Compile contracts
-        run: npx hardhat compile
+        run: yarn hardhat compile
         working-directory: backend
 
       - name: Run tests
-        run: npx hardhat test
+        run: yarn hardhat test
         working-directory: backend
