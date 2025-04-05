@@ -3,17 +3,23 @@ import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "@prisma/client";
 import ws from "ws";
 
-// Sets up WebSocket connections, which enables Neon to use WebSocket communication.
+// Sets up WebSocket connections for Neon
 neonConfig.webSocketConstructor = ws;
-const connectionString = `${process.env.DATABASE_URL}`;
 
-// Creates a new connection pool using the provided connection string, allowing multiple concurrent connections.
+const connectionString =
+  process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error("Database URL is not defined");
+}
+
+// Crée une pool de connexions avec l'URL choisie
 const pool = new Pool({ connectionString });
 
-// Instantiates the Prisma adapter using the Neon connection pool to handle the connection between Prisma and Neon.
+// Initialise l'adaptateur Prisma pour Neon
 const adapter = new PrismaNeon(pool);
 
-// Extends the PrismaClient with a custom result transformer to convert the price and rating fields to strings.
+// Crée le client Prisma
 export const prisma = new PrismaClient({
   adapter,
   // log: ["query"],
