@@ -1,8 +1,7 @@
 "use client";
-
 import { useAccount, useDisconnect, useBalance } from "wagmi";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import {
   DropdownMenu,
@@ -17,11 +16,14 @@ const CustomConnectButton = () => {
   const { address, isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
-  const { data: balance } = useBalance({ address });
-  const { data: qb3Balance } = useBalance({
+  const { data: balance, error: balanceError } = useBalance({ address });
+  const { data: qb3Balance, error: qb3BalanceError } = useBalance({
     address,
     token: `0x${QB3_TOKEN_ADDRESS}`,
   });
+
+  console.log("ETH Balance:", balance, "Error:", balanceError);
+  console.log("QB3 Balance:", qb3Balance, "Error:", qb3BalanceError);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -37,12 +39,16 @@ const CustomConnectButton = () => {
   const baseButtonClasses =
     "px-6 py-3 border border-white text-white rounded-md bg-transparent transition-all duration-300 hover:bg-white hover:text-black";
 
-  const ethBalanceFormatted = balance
-    ? formatUnits(balance.value, balance.decimals)
-    : "Loading...";
-  const qb3BalanceFormatted = qb3Balance
-    ? formatUnits(qb3Balance.value, qb3Balance.decimals)
-    : "";
+  const ethBalanceFormatted = useMemo(
+    () =>
+      balance ? formatUnits(balance.value, balance.decimals) : "Loading...",
+    [balance]
+  );
+  const qb3BalanceFormatted = useMemo(
+    () =>
+      qb3Balance ? formatUnits(qb3Balance.value, qb3Balance.decimals) : "",
+    [qb3Balance]
+  );
 
   if (!isConnected) {
     return (
