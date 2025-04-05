@@ -65,6 +65,31 @@ export const SPACE_REGISTRY_ABI = [
     inputs: [
       {
         indexed: true,
+        internalType: "uint256",
+        name: "spaceId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "newStartTime",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "newEndTime",
+        type: "uint256",
+      },
+    ],
+    name: "AvailabilityUpdated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
         internalType: "address",
         name: "previousOwner",
         type: "address",
@@ -97,6 +122,56 @@ export const SPACE_REGISTRY_ABI = [
     ],
     name: "SpaceRegistered",
     type: "event",
+  },
+  {
+    inputs: [],
+    name: "MIN_AVAILABILITY_DURATION",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "spaceId",
+        type: "uint256",
+      },
+    ],
+    name: "deactivateSpace",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "zoneHash",
+        type: "bytes32",
+      },
+    ],
+    name: "getZoneInfo",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "total",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "used",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
   },
   {
     inputs: [],
@@ -135,6 +210,19 @@ export const SPACE_REGISTRY_ABI = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "spaceId",
+        type: "uint256",
+      },
+    ],
+    name: "reactivateSpace",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -260,6 +348,29 @@ export const SPACE_REGISTRY_ABI = [
       },
     ],
     name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "spaceId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "newStartTime",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "newEndTime",
+        type: "uint256",
+      },
+    ],
+    name: "updateAvailability",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

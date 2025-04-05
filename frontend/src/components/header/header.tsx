@@ -17,7 +17,7 @@ const Header = () => {
         <Link href="/dispatch" legacyBehavior>
           <a>Start Dispatching</a>
         </Link>
-        <Link href="/provide-storage" legacyBehavior>
+        <Link href="/provide-space" legacyBehavior>
           <a>Earn with Storage</a>
         </Link>
         <Link href="/buy-tokens" legacyBehavior>

@@ -134,10 +134,6 @@ const HostApplicationForm = () => {
         return;
       }
 
-      console.log("====================================");
-      console.log(SPACE_REGISTRY_ADDRESS);
-      console.log("====================================");
-
       const hash = await writeContractAsync({
         abi: SPACE_REGISTRY_ABI,
         address: `0x${SPACE_REGISTRY_ADDRESS}`,

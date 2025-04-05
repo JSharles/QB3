@@ -2,12 +2,17 @@ import Link from "next/link";
 import Image from "next/image";
 import LoginButton from "../login-button/login-button";
 
-const HeaderLanding = () => {
+const HeaderDispatch = () => {
   return (
-    <header className="flex items-center justify-between px-8 text-sm text-primary-foreground">
-      <div>
-        <Image src="/images/logo.png" alt="QB3 Logo" width={150} height={150} />
-      </div>
+    <header className="flex items-center justify-between px-8 text-sm bg-gray/10 backdrop-blur-md shadow-md">
+      <Link href="/">
+        <Image
+          src="/images/logo-purple.png"
+          alt="QB3 Logo"
+          width={150}
+          height={150}
+        />
+      </Link>
       <nav className="space-x-8 [&>a]:text-lg [&>a]:text-primary-foreground/60 [&>a]:hover:text-primary-foreground">
         <Link href="/dispatch" legacyBehavior>
           <a>Start Dispatching</a>
@@ -26,4 +31,4 @@ const HeaderLanding = () => {
   );
 };
 
-export default HeaderLanding;
+export default HeaderDispatch;
