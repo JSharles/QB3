@@ -46,22 +46,19 @@ const DispatchRequestForm = () => {
       resolver: zodResolver(dispatchRequestSchema),
     });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [zones, setZones] = useState<
     { id: string; name: string; volume: number }[]
   >([]);
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
 
-  // Fonction vide pour fetch les zones (à remplir plus tard)
-  const fetchZones = async () => {
-    // Logique pour récupérer les zones depuis une API ou autre source
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const fetchZones = async () => {};
 
-  // Surveiller la valeur du champ "zone" pour afficher les détails
   const watchedZone = watch("zone");
 
   const onSubmit = (data: DispatchRequestFormData) => {
-    console.log("Form submitted:", data);
-    // Logique de soumission à implémenter
+    console.log("Form submitted:", data, selectedZone);
   };
 
   return (
@@ -123,7 +120,6 @@ const DispatchRequestForm = () => {
             </div>
           )}
 
-          {/* Volume demandé */}
           <div>
             <Label htmlFor="requestedVolume" className={labelStyle}>
               Requested Volume (m³)
@@ -144,7 +140,6 @@ const DispatchRequestForm = () => {
             )}
           </div>
 
-          {/* Date de prise en charge */}
           <div>
             <Label htmlFor="pickupDate" className={labelStyle}>
               Pickup Date
@@ -162,7 +157,6 @@ const DispatchRequestForm = () => {
             )}
           </div>
 
-          {/* Poids estimé */}
           <div>
             <Label htmlFor="estimatedWeight" className={labelStyle}>
               Estimated Weight (kg)
@@ -183,7 +177,6 @@ const DispatchRequestForm = () => {
             )}
           </div>
 
-          {/* Description */}
           <div className="md:col-span-2">
             <Label htmlFor="description" className={labelStyle}>
               Description
@@ -201,7 +194,6 @@ const DispatchRequestForm = () => {
             )}
           </div>
 
-          {/* Instructions spéciales */}
           <div className="md:col-span-2">
             <Label htmlFor="specialInstructions" className={labelStyle}>
               Special Instructions
@@ -219,7 +211,6 @@ const DispatchRequestForm = () => {
             )}
           </div>
 
-          {/* Bouton de soumission */}
           <div className="md:col-span-2">
             <Button
               type="submit"

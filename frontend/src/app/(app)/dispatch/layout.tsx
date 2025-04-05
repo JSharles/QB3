@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Header from "@/components/header/header";
 import HeaderDispatch from "@/components/header-dispatch/header-dispatch";
 
 export default function DispatchInventoryLayout({
