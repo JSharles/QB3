@@ -163,9 +163,8 @@ describe("QB3 Deployment", () => {
       assert.equal(totalCapacity.toString(), capacity.toString());
       assert.equal(usedCapacity.toString(), "0");
 
-      // Puisque spaceIds n'est pas retourné dans le mapping, on doit vérifier différemment
       const space = await spaceRegistrySc.read.spaces([BigInt(0)]);
-      assert.equal(space[5], zoneHash); // Vérifie que le space appartient à cette zone
+      assert.equal(space[5], zoneHash);
     });
 
     it("should revert with InvalidCapacity when capacity is 0", async () => {
