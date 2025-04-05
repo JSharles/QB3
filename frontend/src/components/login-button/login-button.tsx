@@ -1,8 +1,8 @@
 "use client";
 
-import { useAccount, useDisconnect, useBalance, useChainId } from "wagmi";
+import { useAccount, useDisconnect, useBalance } from "wagmi";
 import { Button } from "../ui/button";
-import { useState, useEffect } from "react"; // Ajoutez useEffect
+import { useState } from "react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import {
   DropdownMenu,
@@ -12,13 +12,11 @@ import {
 } from "../ui/dropdown-menu";
 import { QB3_TOKEN_ADDRESS } from "@/lib/constants";
 import { formatUnits } from "viem";
-import { sepolia } from "wagmi/chains"; // Or import selectedChain from your config
 
 const CustomConnectButton = () => {
-  const { address, isConnected, isConnecting } = useAccount(); // Ajoutez isConnecting
+  const { address, isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
-  const chainId = useChainId();
   const { data: balance } = useBalance({ address });
   const { data: qb3Balance } = useBalance({
     address,
@@ -27,17 +25,6 @@ const CustomConnectButton = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  const selectedChain = sepolia; // Replace with imported selectedChain if needed
-  console.log(
-    "isConnected:",
-    isConnected,
-    "isConnecting:",
-    isConnecting,
-    "Address:",
-    address
-  );
-  console.log("Active Chain ID:", chainId);
 
   const copyToClipboard = () => {
     if (address) {
@@ -56,16 +43,6 @@ const CustomConnectButton = () => {
   const qb3BalanceFormatted = qb3Balance
     ? formatUnits(qb3Balance.value, qb3Balance.decimals)
     : "";
-
-  // Log pour vérifier les changements d'état
-  useEffect(() => {
-    console.log(
-      "Connection state changed - isConnected:",
-      isConnected,
-      "Address:",
-      address
-    );
-  }, [isConnected, address]);
 
   if (!isConnected) {
     return (
@@ -118,11 +95,6 @@ const CustomConnectButton = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {chainId !== selectedChain.id && (
-        <div className="text-red-500 text-xs text-center">
-          Please switch to the {selectedChain.name} network
-        </div>
-      )}
     </div>
   );
 };
