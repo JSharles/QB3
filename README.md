@@ -5,6 +5,8 @@
 
 # QB3 - DePIN pour la logistique du dernier kilomètre
 
+[Explorer la vision QB3](https://hackmd.io/@EMgPpkbwTPCAiv1jWa6XPA/SJ-lCIlTkl)
+
 ## 🧱 Objectifs Pédagogiques (POC)
 
 Ce projet vise à valider les compétences suivantes :
@@ -26,7 +28,7 @@ Ce projet vise à valider les compétences suivantes :
 - **Frontend** : Next.js 15 + Tailwind CSS
 - **Web3** : wagmi + viem + RainbowKit
 - **CI** : GitHub Actions
-- **Déploiement** : (à compléter selon testnet)
+- **Déploiement** : Vercel / Sepolia
 
 ---
 
