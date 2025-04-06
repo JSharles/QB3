@@ -41,3 +41,30 @@ export async function registerConfidentialData(
     return { status: "error", message: "Database error" };
   }
 }
+
+export async function getAvailableZones() {
+  try {
+    const availableZones = await prisma.spaceLocation.groupBy({
+      by: ["city", "zoneHash"],
+      _count: {
+        id: true,
+      },
+    });
+
+    const result = availableZones.map((zone) => ({
+      city: zone.city,
+      zoneHash: zone.zoneHash,
+    }));
+
+    return {
+      status: "ok",
+      data: result,
+    };
+  } catch (error) {
+    console.error("DB query error:", error);
+    return {
+      status: "error",
+      message: "Database error",
+    };
+  }
+}
